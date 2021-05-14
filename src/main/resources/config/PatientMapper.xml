@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="resources.config.PatientMapper">
+
+
+    <resultMap id="resultPatients" type="Patient">
+        <id property="SSN" column="ssn"/>
+        <result property="firstName" column="FIRSTNAME"/>
+        <result property="lastName" column="LASTNAME"/>
+        <result property="sex" column="SEX"/>
+        <result property="dateOfBirth" column="DATE_OF_BIRTH" javaType="java.time.LocalDateTime" jdbcType="DATE"/>
+        <result property="postalCode" column="POSTAL_CODE"/>
+        <result property="city" column="CITY"/>
+    </resultMap>
+
+    <sql id="TableName">PATIENTS</sql>
+
+    <select id="selectAll" resultMap="resultPatients">
+        SELECT * FROM PATIENTS
+    </select>
+
+    <insert id="insertPatient" keyProperty="Patient.SSN" keyColumn="SSN">
+        INSERT INTO PATIENTS
+        <foreach collection="resultMappings" item="entry" separator="," open="(" close=")">
+            ${entry.column}
+        </foreach>
+        VALUES
+        <foreach collection="resultMappings" item="entry" separator="," open="(" close=")">
+            #{entity.${entry.property}}
+        </foreach>
+    </insert>
+
+    <select id="selectCustomData" resultMap="resultPatients">
+        SELECT * FROM PATIENTS
+        <where>
+        <foreach collection="resultMappings" item="entry" separator="AND">
+            ${entry.column} = #{entity.${entry.property}}
+        </foreach>
+        </where>
+    </select>
+
+
+
+    <update id="update" parameterType = "Patient">
+        UPDATE PATIENTS
+        SET
+        FIRSTNAME = #{firstName},
+        LASTNAME = #{lastName}
+        WHERE SSN = #{SSN}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM PATIENTS
+        WHERE
+        <foreach collection="resultMappings" item="entry" separator=" AND ">
+                ${entry.column} = #{entity.${entry.property}}
+        </foreach>
+    </delete>
+
+</mapper>
